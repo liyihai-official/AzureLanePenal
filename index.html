@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>碧蓝航线面板</title>
+  <link rel="stylesheet" href="style.css?v=dcb428283e">
+</head>
+<body class="remote">
+  <div id="bg" class="bg-layer" aria-hidden="true"></div>
+  <div id="bg2" class="bg-layer" aria-hidden="true"></div>
+  <div id="bg-credit"></div>
+  <nav class="nav">
+    <div class="nav-inner">
+      <div class="brand">
+        <svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <defs>
+            <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#5ac8fa"/><stop offset="1" stop-color="#007aff"/>
+            </linearGradient>
+          </defs>
+          <rect x="1" y="1" width="22" height="22" rx="6" fill="url(#g)"/>
+          <path d="M12 5.2c2.6 3.3 4.2 5.6 4.2 7.6a4.2 4.2 0 0 1-8.4 0c0-2 1.6-4.3 4.2-7.6z" fill="#fff"/>
+        </svg>
+        <!-- 程序图标:电脑上直接用 logo.png;远程网页解锁后从加密数据里取 -->
+        <img class="brand-logo" id="brand-logo" alt="" hidden>
+        <span>碧蓝航线面板</span>
+      </div>
+      <!-- 切换:资源一览 / 嵌在窗口里的 Alas 页面(远程网页里隐藏) -->
+      <div class="seg seg-sm view-seg" id="view-seg">
+        <span class="thumb"></span><button data-v="panel">资源</button><button data-v="alas">Alas</button>
+      </div>
+      <div class="nav-right">
+        <button class="pill warn-pill" id="tmpl-hint" hidden></button>
+        <button class="pill warn-pill" id="remote-hint" hidden title="点开设置查看原因">远程上传失败</button>
+        <button class="pill err-pill" id="alas-hint" hidden title="查看 Alas 出错原因"><i></i>Alas 出错</button>
+        <span class="pill warn-pill" id="maint-hint" hidden>游戏维护中</span>
+        <span class="pill status" id="status"><i class="dot"></i><span id="status-text">未运行</span></span>
+        <button class="btn secondary" id="btn-test">测试连接</button>
+        <button class="btn primary" id="btn-start"><span class="ico">▶</span><span class="label">开始采样</span></button>
+        <button class="icon-btn" id="btn-more" title="更多">
+          <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
+        </button>
+        <button class="icon-btn" id="btn-theme" title="切换浅色 / 深色(右键:跟随系统)">
+          <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6" stroke-linecap="round"/></svg>
+          <svg class="ico-moon" viewBox="0 0 24 24"><path d="M20.3 14.6A8.6 8.6 0 0 1 9.4 3.7a.6.6 0 0 0-.8-.7A9.5 9.5 0 1 0 21 15.4a.6.6 0 0 0-.7-.8z"/></svg>
+        </button>
+        <button class="icon-btn" id="btn-settings" title="设置">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4z"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.6-2-3.4-2.4 1a7.6 7.6 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.5A7.6 7.6 0 0 0 7 6.5l-2.4-1-2 3.4 2 1.6a7.6 7.6 0 0 0 0 3l-2 1.6 2 3.4 2.4-1a7.6 7.6 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.6 7.6 0 0 0 2.6-1.5l2.4 1 2-3.4z"/></svg>
+        </button>
+        <div class="menu" id="menu" role="menu">
+          <button data-act="report">查看日报…</button>
+          <button data-act="stats">出击统计…</button>
+          <button data-act="exp">立即记录经验、魔方和勋章</button>
+          <button data-act="tmpl">补数字模板…</button>
+          <button data-act="import">导入 Alas 历史读数…</button>
+          <button data-act="remote">立即上传到 GitHub</button>
+          <hr>
+          <button data-act="export">导出图表图片…</button>
+          <button data-act="open-csv">打开数据 CSV</button>
+          <button data-act="open-exp">打开经验 CSV</button>
+          <button data-act="open-failed">打开识别失败的截图</button>
+          <button data-act="open-folder">打开程序文件夹</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero reveal">
+      <h1>资源一览</h1>
+      <p class="sub" id="hero-sub">正在读取数据…</p>
+    </header>
+
+    <!-- 等级:通栏横条 -->
+    <article class="tile level-bar reveal" data-key="exp">
+      <div class="tile-value" id="v-exp">—</div>
+      <div class="level-progress">
+        <div class="progress"><div class="bar" id="bar-exp"></div></div>
+        <div class="tile-meta"><span id="m-exp"></span></div>
+      </div>
+    </article>
+
+    <div class="lower">
+    <section class="panel reveal">
+      <div class="toolbar">
+        <div class="seg" id="seg-range">
+          <span class="thumb"></span>
+          <button data-v="1h">1 小时</button><button data-v="6h">6 小时</button><button data-v="24h">24 小时</button>
+          <button data-v="3d">3 天</button><button data-v="7d">7 天</button><button data-v="30d">30 天</button>
+          <button data-v="90d">90 天</button><button data-v="1y">1 年</button><button data-v="all">全部</button>
+        </div>
+        <div class="toolbar-right">
+          <div class="candle-opts" id="candle-opts">
+            <label class="field" title="K 线周期"><span class="field-text">周期</span>
+              <select id="period">
+                <option>自动</option><option>5 分</option><option>15 分</option><option>30 分</option>
+                <option>1 时</option><option>4 时</option><option>日</option><option>周</option><option>月</option>
+              </select>
+            </label>
+            <label class="field" title="均线周期,逗号分隔,最多 4 条"><span class="field-text">均线</span><input id="ma" value="5,10,20" spellcheck="false" placeholder="均线"></label>
+          </div>
+          <div class="seg" id="seg-mode">
+            <span class="thumb"></span>
+            <button data-v="line">折线</button><button data-v="candle">K 线</button>
+          </div>
+        </div>
+      </div>
+      <div id="chart"></div>
+      <div class="foot">
+        <span id="range-text"></span>
+        <span class="hint">滚轮缩放 · 拖动平移 · 双击还原<span class="legend-gap"> · <i class="dash"></i>没有读数的时段</span></span>
+      </div>
+    </section>
+
+    <!-- 右侧一栏:物资、石油、Alas(和活动日志用标签切换) -->
+    <div class="side">
+      <article class="tile reveal" data-key="coin">
+        <!-- 标题行:图标 + 名字,后面跟变化量和更新时间(省出一行高度给下面的 Alas 卡片) -->
+        <div class="tile-head">
+          <div class="tile-label"><i style="background:var(--coin)"></i><img class="tile-icon" data-icon="coin" alt="" hidden>物资</div>
+          <div class="tile-meta"><span class="chip" id="c-coin"></span><span id="m-coin"></span></div>
+        </div>
+        <div class="tile-value" id="v-coin">—</div>
+        <div class="tile-pred" id="p-coin" hidden></div>
+      </article>
+      <article class="tile reveal" data-key="oil">
+        <div class="tile-head">
+          <div class="tile-label"><i style="background:var(--oil)"></i><img class="tile-icon" data-icon="oil" alt="" hidden>石油</div>
+          <div class="tile-meta"><span class="chip" id="c-oil"></span><span id="m-oil"></span></div>
+        </div>
+        <div class="tile-value" id="v-oil">—</div>
+        <div class="tile-pred" id="p-oil" hidden></div>
+      </article>
+      <article class="tile reveal" data-key="cube">
+        <div class="tile-head">
+          <div class="tile-label"><i style="background:var(--cube)"></i><img class="tile-icon" data-icon="cube" alt="" hidden>魔方</div>
+          <div class="tile-meta"><span class="chip" id="c-cube"></span><span id="m-cube"></span></div>
+        </div>
+        <div class="tile-value" id="v-cube">—</div>
+        <!-- 勋章(建造-支援页)和魔方放在同一张卡片里 -->
+        <div class="tile-sub" id="medal-line"><img class="tile-icon sub-icon" data-icon="medal" alt="" hidden><span class="sub-label">勋章</span><b id="v-medal">—</b>
+          <span class="chip" id="c-medal"></span><span class="sub-meta" id="m-medal"></span></div>
+      </article>
+      <section class="alascard reveal" id="alascard">
+        <div class="alas-head">
+          <div class="seg seg-sm" id="side-tabs">
+            <span class="thumb"></span>
+            <button data-v="alas">Alas</button><button data-v="work" title="委托和科研">委托</button><button data-v="fleet">编队</button><button data-v="log">活动</button>
+          </div>
+          <h2 class="remote-only">Alas</h2>
+          <span class="alas-badge" id="alas-badge"><i></i><span>读取中…</span></span>
+        </div>
+        <div class="pane" id="alas-pane">
+          <div class="alas-now" id="alas-now"></div>
+          <div class="alas-list" id="alas-list"></div>
+        </div>
+        <div class="pane" id="work-pane" hidden>
+          <div class="work-sec"><h4 id="w-comm-head">委托</h4><div id="w-comm"></div></div>
+          <div class="work-sec"><h4 id="w-res-head">科研</h4><div id="w-res"></div></div>
+          <div class="alas-foot" id="w-foot"></div>
+        </div>
+        <div class="pane" id="fleet-pane" hidden>
+          <div id="fleet-list"></div>
+          <button class="link fleet-pending" id="fleet-pending" hidden></button>
+          <div class="alas-foot" id="fleet-foot"></div>
+        </div>
+        <div class="pane" id="log-pane" hidden>
+          <div class="log-sub" id="log-sub"></div>
+          <div class="log" id="log"><div class="log-empty">点“开始采样”后,每次采样的结果会显示在这里</div></div>
+        </div>
+      </section>
+    </div>
+    </div>
+  </main>
+
+  <!-- 嵌在面板窗口里的 Alas 页面(经本机代理和面板同源,面板给它换肤;Alas 的功能全是它自己的) -->
+  <section class="alas-view" id="alas-view" hidden>
+    <iframe id="alas-frame" title="Alas" hidden></iframe>
+    <div class="alas-empty" id="alas-empty" hidden>
+      <div class="alas-empty-title" id="alas-empty-title">Alas 没有在运行</div>
+      <div class="alas-empty-sub" id="alas-empty-sub">先启动 AlasApp,再点“重新连接”。</div>
+      <button class="btn primary" id="alas-retry">重新连接</button>
+    </div>
+  </section>
+
+  <!-- 设置 -->
+  <div class="modal sheet-layer" id="settings" aria-hidden="true">
+    <div class="sheet big" role="dialog">
+      <div class="sheet-head"><h3>设置</h3><span class="sheet-note" id="s-running-note" hidden>采样中:连接、采样、跳变检查、记录间隔要先停止采样才能改</span></div>
+      <div class="sheet-body">
+        <div class="group-title">连接</div>
+        <div class="group">
+          <label class="row"><span class="row-label">Alas 文件夹</span>
+            <span class="row-val grow"><input id="s-root" class="wide" spellcheck="false" data-lock><button class="link" id="s-browse" data-lock>选择…</button></span></label>
+          <div class="row sub" id="s-adb"></div>
+          <label class="row"><span class="row-label">Alas 实例</span><select id="s-instance" data-lock></select></label>
+          <label class="row"><span class="row-label">Serial</span><input id="s-serial" spellcheck="false" data-lock></label>
+          <label class="row"><span class="row-label">游戏服务器(查维护)</span>
+            <span class="row-val"><input id="s-game_server" class="wide-num" list="s-game_server-list" placeholder="如 马里亚纳,留空不查" spellcheck="false"><datalist id="s-game_server-list"></datalist><button class="link" id="s-check-server">查一次</button></span></label>
+          <div class="row sub" id="s-server-result"></div>
+          <label class="row"><span class="row-label">我的时区(你本人所在地)</span>
+            <input id="s-user_tz" class="wide-num" list="s-user_tz-list" placeholder="如 Europe/London,留空不补" spellcheck="false"><datalist id="s-user_tz-list"></datalist></label>
+          <div class="row sub" id="s-tz-hint"></div>
+        </div>
+        <div class="group-foot">选择 Alas 所在的文件夹即可(例如 AlasApp_0.4.8_fullcn),程序会自动找到 Alas 自带的 adb.exe;换实例时 Serial 会自动换成该实例的。面板、推送、远程网页的时间都按北京时间(和游戏、Alas、官网公告一致);填了“我的时区”,维护时间、预计时间、推送里会在括号补上你那里的时间(远程网页没填时用手机的时区)。</div>
+
+        <div class="group-title">采样</div>
+        <div class="group">
+          <label class="row"><span class="row-label">采样间隔</span><span class="row-val"><input id="s-interval" class="num" data-lock> 秒</span></label>
+          <label class="row"><span class="row-label">没有资源栏的采样也写进 CSV</span><input type="checkbox" class="switch" id="s-log_no_bar" data-lock></label>
+          <label class="row"><span class="row-label">同时读取 Alas 日志里的资源读数</span><input type="checkbox" class="switch" id="s-read_alas_log" data-lock></label>
+        </div>
+
+        <div class="group-title">跳变检查</div>
+        <div class="group">
+          <label class="row"><span class="row-label">石油跳变阈值</span><input id="s-max_jump" class="num" data-lock></label>
+          <label class="row"><span class="row-label">石油每分钟放宽</span><input id="s-rate" class="num" data-lock></label>
+          <label class="row"><span class="row-label">物资跳变阈值</span><input id="s-coin_max_jump" class="num" data-lock></label>
+          <label class="row"><span class="row-label">物资每分钟放宽</span><input id="s-coin_rate" class="num" data-lock></label>
+          <label class="row"><span class="row-label">确认次数</span><input id="s-confirm" class="num" data-lock></label>
+        </div>
+        <div class="group-foot">新读数和上次有效读数相差超过“阈值 + 每分钟放宽 × 相隔分钟数”就先丢弃;连续“确认次数”次读数彼此接近,才认为是真实的大变化(比如一次买了很多东西)。</div>
+
+        <div class="group-title">经验、魔方和勋章</div>
+        <div class="group">
+          <label class="row"><span class="row-label">Alas 空闲时自动记录经验、魔方和勋章</span><input type="checkbox" class="switch" id="s-exp_auto"></label>
+          <label class="row"><span class="row-label">经验、魔方和勋章记录间隔</span><span class="row-val"><input id="s-exp_interval_h" class="num" data-lock> 小时</span></label>
+          <label class="row"><span class="row-label">编队记录间隔</span><span class="row-val"><input id="s-fleet_interval_h" class="num" data-lock> 小时</span></label>
+          <label class="row"><span class="row-label">追踪的水面舰队</span>
+            <select id="s-fleet_surface"><option value="0">不追踪</option><option value="1">第一舰队</option><option value="2">第二舰队</option>
+              <option value="3">第三舰队</option><option value="4">第四舰队</option><option value="5">第五舰队</option><option value="6">第六舰队</option></select></label>
+          <label class="row"><span class="row-label">追踪的潜艇舰队</span>
+            <select id="s-fleet_sub"><option value="0">不追踪</option><option value="1">第一舰队</option><option value="2">第二舰队</option></select></label>
+        </div>
+        <div class="group-foot">会点击游戏:只在 Alas 正在等待下个任务(至少还有 3 分钟)且游戏停在干净的主界面时,点头像读取等级和经验再返回、点右下角“建造”读取心智魔方再返回、点“建造 → 支援”读取勋章再返回、点“编队”读取选定舰队每条船的名字和等级再返回,每步截图确认,出现意外会自动关闭。注意:在 Alas 等待期间暂停 Alas 去手动玩,面板仍会当作 Alas 空闲,可能在主界面时点击;手动玩之前先关掉这个开关。</div>
+
+        <div class="group-title">资源上限</div>
+        <div class="group">
+          <label class="row"><span class="row-label">物资上限</span><input id="s-res_coin_cap" class="num"></label>
+          <label class="row"><span class="row-label">石油上限</span><input id="s-res_oil_cap" class="num"></label>
+        </div>
+        <div class="group-foot">填游戏资源栏上方的 “MAX” 数字(指挥官升级后会变大)。用来预测物资、石油几点到上限;石油还会预测几点降到 Alas 主线图的停止出击线(Alas 设置里的“石油低于多少停止”)。</div>
+
+        <div class="group-title">提醒</div>
+        <div class="group">
+          <label class="row"><span class="row-label">Alas 出错时闪烁任务栏图标</span><input type="checkbox" class="switch" id="s-alas_flash"></label>
+        </div>
+        <div class="group-foot">Alas 出错停下时,顶栏会出现红色的“Alas 出错”;打开这个开关,窗口不在前台时任务栏图标还会闪烁。开了远程查看的话,会马上上传一次,手机上很快就能看到。</div>
+
+        <div class="group-title">手机推送</div>
+        <div class="group">
+          <label class="row"><span class="row-label">Server酱 SendKey</span>
+            <span class="row-val"><input id="n-sckey" type="password" class="wide-num" autocomplete="off" spellcheck="false"><button class="link" id="n-sckey-clear" hidden>清除</button></span></label>
+          <label class="row"><span class="row-label">发件邮箱</span><input id="s-notify_mail_from" class="wide-num" placeholder="如 12345@qq.com" spellcheck="false"></label>
+          <label class="row"><span class="row-label">邮箱授权码</span>
+            <span class="row-val"><input id="n-mail_pass" type="password" class="wide-num" autocomplete="new-password" spellcheck="false"><button class="link" id="n-mail_pass-clear" hidden>清除</button></span></label>
+          <label class="row"><span class="row-label">收件邮箱</span><input id="s-notify_mail_to" class="wide-num" placeholder="留空就发给发件邮箱" spellcheck="false"></label>
+          <label class="row"><span class="row-label">SMTP 服务器</span><input id="s-notify_mail_smtp" class="wide-num" placeholder="留空自动选择" spellcheck="false"></label>
+          <label class="row"><span class="row-label">Alas 出错停下</span><input type="checkbox" class="switch" id="s-notify_alas_error"></label>
+          <label class="row"><span class="row-label">Alas 卡住太久(运行中 20 分钟没有新日志)</span><input type="checkbox" class="switch" id="s-notify_alas_stalled"></label>
+          <label class="row"><span class="row-label">模拟器/截图断开(采样时连续 3 次截图失败)</span><input type="checkbox" class="switch" id="s-notify_adb"></label>
+          <label class="row"><span class="row-label">物资到上限(降到 95% 以下后才会再提醒)</span><input type="checkbox" class="switch" id="s-notify_coin_full"></label>
+          <label class="row"><span class="row-label">游戏维护开始 / 结束(维护期间不推送 Alas 出错、卡住、断开)</span><input type="checkbox" class="switch" id="s-notify_maintenance"></label>
+          <label class="row"><span class="row-label">“空闲时自动记录”出意外被自动关掉</span><input type="checkbox" class="switch" id="s-notify_exp_off"></label>
+          <label class="row"><span class="row-label">每日报告(推送前一天的汇总)</span><input type="checkbox" class="switch" id="s-report_enabled"></label>
+          <label class="row"><span class="row-label">日报推送时间</span><input id="s-report_time" class="num" placeholder="08:00" spellcheck="false"></label>
+          <div class="row">
+            <span class="row-label">填好后先发一条试试</span>
+            <button class="link" id="n-test">发送测试消息</button>
+          </div>
+          <div class="row sub" id="n-test-result"></div>
+        </div>
+        <div class="group-foot">Server酱:微信扫码登录 sct.ftqq.com,在 SendKey 页面复制(免费版每天 5 条)。邮件:QQ/163 邮箱在网页版“设置 → 账户”里开启 SMTP 服务,生成“授权码”填在这里(不是登录密码)。两种可以只填一种,也可以都填。同一次出错只推送一次。SendKey 和授权码只保存在本机 config.json,不会上传。</div>
+
+        <div class="group-title">背景</div>
+        <div class="group">
+          <label class="row"><span class="row-label">背景</span>
+            <select id="b-mode">
+              <option value="latest">官网最新壁纸</option><option value="random">随机轮换</option>
+              <option value="fixed">固定一张</option><option value="local">本机图片</option><option value="off">关闭</option>
+            </select></label>
+          <div class="row bg-current">
+            <img id="b-thumb" alt="">
+            <span class="row-label bg-current-text"><span id="b-title">—</span><span id="b-artist"></span></span>
+            <span class="row-val"><button class="link" id="b-pick">选择壁纸…</button><button class="link" id="b-local">本机图片…</button></span>
+          </div>
+          <label class="row" id="b-rotate-row"><span class="row-label">轮换间隔</span>
+            <span class="row-val"><input id="b-rotate" class="num"> 小时<button class="link" id="b-next">换一张</button></span></label>
+          <label class="row"><span class="row-label">模糊</span><span class="row-val"><input type="range" id="b-blur" min="0" max="20" step="1"><span class="range-val" id="b-blur-val"></span></span></label>
+          <label class="row"><span class="row-label">暗度</span><span class="row-val"><input type="range" id="b-dim" min="0.15" max="0.9" step="0.05"><span class="range-val" id="b-dim-val"></span></span></label>
+        </div>
+        <div class="group-foot">壁纸来自碧蓝航线官网 Wallpapers(版权属于 Yostar 和画师),只在本机显示,不会上传到远程查看网页。背景的改动立即生效,不用点“保存”。</div>
+
+        <div class="group-title">Alas 换肤</div>
+        <div class="group">
+          <label class="row"><span class="row-label">打开 Alas 时换肤</span><input type="checkbox" class="switch" id="k-enabled"></label>
+          <label class="row"><span class="row-label">外观</span>
+            <select id="k-theme"><option value="auto">跟随系统</option><option value="light">浅色</option><option value="dark">深色</option></select></label>
+          <div class="row"><span class="row-label">主色</span><span class="row-val k-swatches" id="k-swatches"></span></div>
+          <label class="row"><span class="row-label">圆角</span>
+            <select id="k-radius"><option value="6">小</option><option value="12">中</option><option value="18">大</option></select></label>
+          <label class="row"><span class="row-label">背景</span>
+            <select id="k-bg"><option value="wallpaper">透出面板背景</option><option value="gradient">主色渐变</option><option value="plain">纯色</option></select></label>
+          <label class="row" id="k-dim-row"><span class="row-label">背景遮罩</span>
+            <span class="row-val"><input type="range" id="k-dim" min="0" max="0.9" step="0.05"><span class="range-val" id="k-dim-val"></span></span></label>
+          <div class="row"><span class="row-label">看效果</span><button class="link" id="k-open">切到 Alas 页面</button></div>
+        </div>
+        <div class="group-foot">顶栏切到“Alas”时,Alas 自己的网页嵌在面板窗口里,用这里的外观;改动立即生效,不用点“保存”。只改外观,不改 Alas 的任何文件和功能。“透出面板背景”时,上面“背景”里的壁纸会透过来,“背景遮罩”越大,盖在壁纸上的底色越浓。</div>
+
+        <div class="group-title">远程查看(GitHub Pages)</div>
+        <div class="group">
+          <label class="row"><span class="row-label">仓库</span><input id="s-remote_repo" class="wide-num" placeholder="用户名/仓库名" spellcheck="false"></label>
+          <label class="row"><span class="row-label">分支</span><input id="s-remote_branch" class="num" placeholder="main" spellcheck="false"></label>
+          <label class="row"><span class="row-label">访问令牌</span><input id="s-remote_token" type="password" class="wide-num" autocomplete="off" spellcheck="false"></label>
+          <label class="row"><span class="row-label">查看密码</span><input id="s-remote_password" type="password" class="wide-num" autocomplete="new-password"></label>
+          <label class="row"><span class="row-label">采样时每 10 分钟自动上传</span><input type="checkbox" class="switch" id="s-remote_enabled"></label>
+          <div class="row">
+            <span class="row-label" id="s-remote-url-wrap"><button class="link" id="s-remote-url" hidden></button><span id="s-remote-url-none">保存仓库后显示网页地址</span></span>
+            <button class="link" id="s-remote-upload">立即上传</button>
+          </div>
+          <div class="row sub" id="s-remote-last"></div>
+          <label class="row"><span class="row-label">每天备份数据(用查看密码加密,存到这个仓库的 backup 分支)</span><input type="checkbox" class="switch" id="s-backup_enabled"></label>
+          <div class="row">
+            <span class="row-label" id="s-backup-last">还没有备份过</span>
+            <span class="row-val"><button class="link" id="s-backup-now">立即备份</button><button class="link" id="s-backup-open">备份文件夹</button><button class="link" id="s-backup-restore">从备份恢复…</button></span>
+          </div>
+          <div class="row sub" id="s-backup-result"></div>
+        </div>
+        <div class="group-foot">数据在电脑上用“查看密码”加密后才上传,仓库里只有密文;打开网页时输入这个密码查看。密码本身不保存,只保存由它算出的密钥;改密码后手机上要重新输入。访问令牌只保存在本机的 config.json 里。第一次上传后,到仓库的 Settings → Pages 选 “Deploy from a branch” → main / (root) 打开网页。数据备份:每天 5 点后自动做一次(记录、模板、日报和去掉了令牌密码的设置),程序旁边 backups 文件夹留一份,也传到仓库的 backup 分支(只有密文,网页不会发布它);保留最近 7 天每天一份和再往前 4 周每周一份。恢复要用查看密码,忘了就解不开。</div>
+      </div>
+      <div class="sheet-btns">
+        <button class="btn secondary" data-close>取消</button>
+        <button class="btn primary" id="s-save">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 选择壁纸 -->
+  <div class="modal sheet-layer" id="picker" aria-hidden="true">
+    <div class="sheet big wide" role="dialog">
+      <div class="sheet-head"><h3>选择壁纸</h3><span class="sheet-note" id="p-count"></span></div>
+      <div class="sheet-body"><div class="wall-grid" id="p-grid"></div></div>
+      <div class="sheet-btns">
+        <span class="sheet-note p-note">来自碧蓝航线官网 Wallpapers · 点一张设为背景</span>
+        <button class="btn secondary" data-close>关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 补数字模板 -->
+  <!-- 编队识别:给没见过的舰船名字、认不出的等级填一次 -->
+  <div class="modal sheet-layer" id="fleetlabel" aria-hidden="true">
+    <div class="sheet big" role="dialog">
+      <div class="sheet-head"><h3>编队识别</h3><span class="sheet-note">填一次就记住,之后自动认出</span></div>
+      <div class="sheet-body">
+        <p class="sheet-desc">下面是编队页截图里没认出来的部分。名字照着图片填舰船名(和游戏里写法一样,比如“柯妮V”);等级填图片里 Lv. 后面的数字。不确定的可以留空,下次再填。</p>
+        <div id="fl-items"></div>
+        <datalist id="ship-names"></datalist>
+        <div class="group-foot">输入名字时会提示官方舰船名(来自碧蓝航线 BWiki 舰船图鉴)。誓约后改的自定义名字不在名单里也没关系,照着图片填就行。</div>
+      </div>
+      <div class="sheet-btns">
+        <button class="btn secondary" data-close>取消</button>
+        <button class="btn primary" id="fl-save">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 出击统计 -->
+  <div class="modal sheet-layer" id="stats" aria-hidden="true">
+    <div class="sheet big wide" role="dialog">
+      <div class="sheet-head stats-head"><h3>出击统计</h3>
+        <div class="seg seg-sm" id="st-mode"><span class="thumb"></span><button data-v="day">按天</button><button data-v="week">周报</button></div>
+        <span class="sheet-note" id="st-note">最近 7 天 · 点一行看当天每张图</span></div>
+      <div class="sheet-body">
+        <table class="stats-table" id="st-table"></table>
+        <h4 class="stats-h" id="st-tl-head"></h4>
+        <div class="stats-timeline" id="st-timeline"></div>
+        <div class="stats-day" id="st-day"></div>
+        <div class="group-foot">出击 = Alas 进图一次。出击花油 = 进图前 1 分钟到出击结束之间石油减少的量(用面板截图和 Alas 战斗前自己识别的读数),委托、奖励带来的增加不算。经验来自自动记录的经验,每 1% 指等级进度条的 1%。</div>
+      </div>
+      <div class="sheet-btns"><button class="btn primary" data-close>关闭</button></div>
+    </div>
+  </div>
+
+  <!-- 每日报告 -->
+  <div class="modal sheet-layer" id="report" aria-hidden="true">
+    <div class="sheet big" role="dialog">
+      <div class="sheet-head">
+        <h3 id="r-title">日报</h3>
+        <div class="seg seg-sm" id="r-tabs"><span class="thumb"></span><button data-v="yesterday">昨天</button><button data-v="today">今天到现在</button></div>
+      </div>
+      <div class="sheet-body"><div class="report-body" id="r-body">生成中…</div></div>
+      <div class="sheet-btns">
+        <span class="sheet-note" id="r-note"></span>
+        <button class="btn secondary" id="r-send">发送到手机</button>
+        <button class="btn primary" data-close>关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal sheet-layer" id="tmpl" aria-hidden="true">
+    <div class="sheet big" role="dialog">
+      <div class="sheet-head"><h3>补数字模板</h3><span class="sheet-note warn" id="t-missing"></span></div>
+      <div class="sheet-body">
+        <p class="sheet-desc">选一张识别失败的截图(默认是 failed 文件夹里最新的一张),填上截图里<b>实际显示</b>的数值。主界面截图填石油/物资;个人信息页截图填等级/经验;建造页截图填魔方;建造-支援页截图填勋章。</p>
+        <div class="shot" id="t-shot">
+          <img id="t-img" alt="">
+          <div class="shot-empty" id="t-empty">还没有选择截图</div>
+        </div>
+        <div class="shot-meta"><span id="t-name"></span><button class="link" id="t-pick">选择截图…</button></div>
+        <div class="zoom" id="t-zoom" hidden><img id="t-zoom-img" alt=""><span id="t-kind"></span></div>
+        <div class="group">
+          <label class="row"><span class="row-label">石油</span><input id="t-oil" class="num" placeholder="如 4110" spellcheck="false"></label>
+          <label class="row"><span class="row-label">物资</span><input id="t-coin" class="num" placeholder="如 96627" spellcheck="false"></label>
+          <label class="row"><span class="row-label">等级</span><input id="t-level" class="num" placeholder="如 145" spellcheck="false"></label>
+          <label class="row"><span class="row-label">经验</span><input id="t-exp" class="num wide-num" placeholder="如 209732/222700" spellcheck="false"></label>
+          <label class="row"><span class="row-label">魔方</span><input id="t-cube" class="num" placeholder="如 265" spellcheck="false"></label>
+          <label class="row"><span class="row-label">勋章</span><input id="t-medal" class="num" placeholder="如 24" spellcheck="false"></label>
+          <label class="row"><span class="row-label">已有的数字也保存一个变体</span><input type="checkbox" class="switch" id="t-variant"></label>
+        </div>
+        <div class="group-foot">“变体”用在某个数字老是识别不稳的时候。保存后正在进行的采样下一次就会用上新模板。</div>
+      </div>
+      <div class="sheet-btns">
+        <button class="btn secondary" data-close>取消</button>
+        <button class="btn primary" id="t-save">保存模板</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Apple 风格的提示框 -->
+  <div class="modal" id="modal" aria-hidden="true">
+    <div class="sheet" role="dialog">
+      <h3 id="modal-title"></h3>
+      <p id="modal-text"></p>
+      <input id="modal-input" type="password" class="modal-input" autocomplete="off" hidden>
+      <div class="sheet-btns" id="modal-btns"></div>
+    </div>
+  </div>
+
+  <script src="vendor/echarts.min.js?v=8f667a68e5"></script>
+  <script src="remote.js?v=7addb58a88"></script>
+  <script src="app.js?v=64745ac140"></script>
+</body>
+</html>
